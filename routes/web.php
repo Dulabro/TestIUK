@@ -21,7 +21,7 @@ Route::get('/', function () {
     // if(auth()->user()){
     //     auth()->user()->assignRole('admin');
     // } 
-    return view('auth.login');
+    return view('welcome');
 });
 
 Route::get('/test',function(){
