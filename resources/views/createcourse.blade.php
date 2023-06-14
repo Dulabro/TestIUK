@@ -8,22 +8,29 @@
       </svg>
    </div>
    <div class="row justify-content-center">
-      <div class="col-md-12">
+      <div class="col-md-6">
          <div class="">
             <div class="card-body">
+               <div class="card-header text-light" style="font-size:23px; text-align:center; height:4rem;">{{ __('Лист создания курса') }}</div>
                <form action="/courses" method="post">
                   @csrf
                   <label class="text-white" for="name" class="col-md-4 col-form-label text-md-end">{{ __('Название курса') }}</label>
-                  <input type="text" class="form-control" name="name" id="name">
+                  <input type="text" placeholder="Введите название курса.." class="form-control" name="name" id="name">
                   <label class="text-white"  for="name" class="col-md-4 col-form-label text-md-end">{{ __('Введите краткое описание курса') }}</label>
-                  <textarea name="description" class="form-control" id="description"></textarea>
+                  <textarea name="description"  placeholder="Введите описание курса" class="form-control" id="description"></textarea>
                   <label class="text-white"  for="name" class="col-md-4 col-form-label text-md-end">{{ __('Длительность курса') }}</label>
-                  <input type="number" class="form-control" name="duration" id="duration">
+                  <input type="number"  placeholder="Введите длительность курса" class="form-control" name="duration" id="duration">
                   <label class="text-white"  for="name" class="col-md-4 col-form-label text-md-end">{{ __('Код курса') }}</label>
-                  <input type="text" class="form-control" name="code_course" id="code_course">
-                  <button class="btn btn-primary" type="submit">Создать курс</button>
+                  <input type="text"  placeholder="Код курса" class="form-control" name="code_course" id="code_course">
+                  
+                  <div class="text-center">
+                     <button class="btn main large-button"type="submit">Создать курс</button>
+                   </div>
                </form>
-               <button class="btn btn-warning" onclick="rand()">Генерировать код</button>
+               <div class="text-center">
+               <button class="btn main large-button" onclick="rand()">Генерировать код</button>
+            </div>
+              
             </div>
          </div>
       </div>

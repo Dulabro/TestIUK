@@ -18,7 +18,7 @@ class ChangePasswordController extends Controller
         $user = Auth::user();
 
         if (!Hash::check($request->current_password, $user->password)) {
-            return back()->withErrors(['current_password' => 'The current password is incorrect.']);
+            return back()->withErrors(['current_password' => 'Текущий пароль неверен.']);
         }
 
         $user->password = Hash::make($request->new_password);
@@ -32,10 +32,10 @@ class ChangePasswordController extends Controller
         $user = Auth::user();
         $user->name = $request->input('name');
         $user->email = $request->input('email');
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('profile_images', 'public');
-            $user->image = $imagePath;
-        }
+        // if ($request->hasFile('image')) {
+        //     $imagePath = $request->file('image')->store('profile_images', 'public');
+        //     $user->image = $imagePath;
+        // }
         $user->save();
 
         return redirect()->back()->with('success', 'Профиль успешно обновлен.');

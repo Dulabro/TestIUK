@@ -9,19 +9,73 @@
    </div>
    <form method="POST" action="{{ route('lectures.update', $lecture->id) }}">
       @csrf @method('PUT')
+      <div class="lecture">
       <div class="form-group">
          <label class="text-white" for="name">Введите название лекции</label>
          <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $lecture->name) }}">
       </div>
+    
       <div class="form-group">
          <label class="text-white" for="description">Введите краткое описание лекции</label>
-         <textarea class="form-control" id="description" name="description">{{ old('description', $lecture->description) }}</textarea>
+         <textarea class="form-control" id="description" style="overflow: hidden" name="description">{{ old('description', $lecture->description) }}</textarea>
       </div>
+   </div>
+
       <div class="form-group">
          <label class="text-white" for="text_lectures">Введите содержимое лекции</label>
-         <textarea class="form-control" id="text_lectures" name="text_lectures">{{ old('text_lectures', $lecture->text_lectures) }}</textarea>
+         <input class="tinymce" id="editor" class="form-control" value="{{ old('text_lectures', $lecture->text_lectures) }}" placeholder="Введите содержимое лекции'" name="text_lectures"/>
+         {{-- <textarea class="form-control" id="text_lectures" style="overflow: hidden" name="text_lectures">{{ old('text_lectures', $lecture->text_lectures) }}</textarea> --}}
       </div>
-      <button type="submit" class="btn btn-primary">Обновить лекцию</button>
+      <div class="text-center">
+      <button type="submit" class="btn main large-button">Обновить лекцию</button>
+      <a href="{{ url()->previous()->previous()  }}" class="btn main large-button">Назад</a>
+   </div>
    </form>
 </div>
+<script>
+   tinymce.init({
+     selector: '#editor',
+     plugins: 'powerpaste advcode code casechange searchreplace autolink directionality advcode visualblocks visualchars image link media mediaembed codesample table charmap pagebreak nonbreaking anchor tableofcontents insertdatetime advlist lists checklist wordcount tinymcespellchecker editimage help formatpainter permanentpen charmap linkchecker emoticons advtable export autosave',
+     toolbar: 'code | undo redo formatpainter | visualblocks | alignleft aligncenter alignright alignjustify | blocks fontfamily fontsize | bold italic underline forecolor backcolor | lineheight | removeformat',
+     height: '400px',
+   });
+</script>
+<script>
+$(document).ready(function() {
+    // Configure/customize these variables.
+    var showChar = 100;  // How many characters are shown by default
+    var ellipsestext = "...";
+    var moretext = "Show more >";
+    var lesstext = "Show less";
+    
+
+    $('.more').each(function() {
+        var content = $(this).html();
+ 
+        if(content.length > showChar) {
+ 
+            var c = content.substr(0, showChar);
+            var h = content.substr(showChar, content.length - showChar);
+ 
+            var html = c + '<span class="moreellipses">' + ellipsestext+ '&nbsp;</span><span class="morecontent"><span>' + h + '</span>&nbsp;&nbsp;<a href="" class="morelink">' + moretext + '</a></span>';
+ 
+            $(this).html(html);
+        }
+ 
+    });
+ 
+    $(".morelink").click(function(){
+        if($(this).hasClass("less")) {
+            $(this).removeClass("less");
+            $(this).html(moretext);
+        } else {
+            $(this).addClass("less");
+            $(this).html(lesstext);
+        }
+        $(this).parent().prev().toggle();
+        $(this).prev().toggle();
+        return false;
+    });
+});
+</script>
 @endsection

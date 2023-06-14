@@ -7,7 +7,9 @@ use App\Models\Courses;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use App\Models\Test;
+use App\Models\CourseAuthor;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class CourseController extends Controller
 {
@@ -37,23 +39,34 @@ class CourseController extends Controller
     public function course()
     {
         $user = Auth::user();
+        $courseIds = Courses::pluck('id')->toArray();
+        $id_author = auth()->id();
         if($user->id_status=="1")
         {
-            $id_author = auth()->id();
-            // $courses = DB::table('courses')->where('id_author', $id_author)->get();
-            $courses = Courses::select("courses.id","courses.name","courses.description","courses.duration","users.name as author_name")->leftJoin("users", "courses.id_author", "=", "users.id")->where('id_author', $id_author)->get();
+            $courses = DB::table('courses')
+            ->join('users', 'courses.id_author', '=', 'users.id')
+            ->leftJoin('lectures', 'courses.id', '=', 'lectures.id_course')
+            ->leftJoin('tests', 'courses.id', '=', 'tests.id_course')
+            ->select('courses.id','courses.name', 'courses.description', 'courses.duration', 'users.name as author_name', DB::raw('COUNT(DISTINCT lectures.id) as lecture_count'), DB::raw('COUNT(DISTINCT tests.id) as test_count'))
+            ->whereIn('courses.id', $courseIds)
+            ->where('courses.id_author', $id_author)
+            ->groupBy('courses.id', 'courses.name', 'courses.description', 'courses.duration', 'users.name')
+            ->get();
         }
         else if($user->id_status=="2")
         {
-            $id_author = auth()->id();
-            // $courses = DB::table('courses')->where('id_author', $id_author)->get();
-            // $courses = CourseAuthor::select('courses.id as courses_id', 'courses.name as courses_name', 'courses.description as courses_description')->leftJoin('courses', 'CourseAuthors.id_course', '=', 'courses.id')->where('id_author', $id_author)->get();
-
-            $courses =   DB::table('CourseAuthors')
+            $courses = DB::table('CourseAuthors')
             ->leftJoin('courses', 'CourseAuthors.id_course', '=', 'courses.id')
-            ->select('courses.id as courses_id', 'courses.name as courses_name', 'courses.description as courses_description', 'courses.duration as courses_duration')
-            ->where('CourseAuthors.id_author', '=', $id_author)
+            ->join('users', 'courses.id_author', '=', 'users.id')
+            ->leftJoin('lectures', 'courses.id', '=', 'lectures.id_course')
+            ->leftJoin('tests', 'courses.id', '=', 'tests.id_course')
+            ->select('courses.id', 'courses.name', 'courses.description', 'courses.duration', 'users.name as author_name', DB::raw('COUNT(DISTINCT lectures.id) as lecture_count'), DB::raw('COUNT(DISTINCT tests.id) as test_count'))
+            ->whereIn('courses.id', $courseIds)
+            ->where('CourseAuthors.id_author', $id_author)
+            ->groupBy('courses.id','courses.name', 'courses.description', 'courses.duration', 'users.name')
             ->get();
+
+        
         }
         return view('course')->with('courses', $courses);
     }
@@ -63,7 +76,7 @@ class CourseController extends Controller
         $id_user = $courses->id_author;
         $user = DB::table('users')->where('id', $id_user)->first();
         $user_name = $user->name;
-        $tests = DB::table('tests')->get();
+        $tests =  DB::table('tests')->where('id_course', $courses->id)->get();
         // $lectures = DB::table('lectures')->where('id_course', $courses->id)->first();
         $lectures = DB::table('lectures')->where('id_course', $courses->id)->get();
         return view('courses')->with('course', $courses)
@@ -75,9 +88,8 @@ class CourseController extends Controller
     {
         $user = User::join('CourseAuthors', 'CourseAuthors.id_author', '=', 'users.id')
              ->where('CourseAuthors.id_course', $id)
-             ->select('users.name', 'users.email')
              ->get();
-            
+        
              return view('users')->with('users', $user);
     }
     public function destroy($id)
@@ -90,16 +102,18 @@ class CourseController extends Controller
             return redirect()->route('home')->with('error', 'Курс не найден');
         }
     }
+
     public function deleteUsers($id)
     {
-        $user = CourseAuthors::find($id);
-        
-        if ($user) {
-            $user->delete();
-        } else {
-            // Пользователь не найден
-        }
-      
+        $deletedRows = DB::table('CourseAuthors')
+                    ->where('id', $id)
+                    ->delete();
+                    if ($deletedRows > 0) {
+                        Session::flash('success', 'Пользователь удален');
+                    } else {
+                        Session::flash('error', 'Пользователь не найден');
+                    }
+                    return back();
     }
 
     

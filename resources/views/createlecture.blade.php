@@ -1,5 +1,6 @@
 @extends('layouts.app') @section('content')
 <link href="{{ asset('css/home.css') }}" rel="stylesheet">
+<script src="https://cdn.ckeditor.com/ckeditor5/38.0.1/classic/ckeditor.js"></script>
 <div class="container">
    <div class="shape_hero">
       <svg width="747" height="765" viewBox="0 0 747 765" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -7,33 +8,21 @@
       </svg>
    </div>
    <div class="row justify-content-center">
-      <div class="col-md-12">
+      <div class="col-md-6">
          <div class="">
-            <div class="card-header text-light">{{ __('Лист создание лекции') }}</div>
+            <div class="card-header text-light" style="font-size:23px; text-align:center; height:4rem;">{{ __('Лист создания лекции') }}</div>
             <div class="card-body">
-               <form action="/lectures" method="post">
+               <form action="/lectures" method="post" enctype="multipart/form-data">
                   @csrf
-                  <div class="row mb-3">
-                     <label for="name" class="col-md-4 col-form-label text-light text-md-end">{{ __('Введите название лекции') }}</label>
-                     <div class="col-md-6">
-                        <input type="text" class="form-control" name="name" id="name">
+                  <div class="mb-3">
+                     <label class="text-white" for="name" class="col-md-4 col-form-label text-md-end">{{ __('Введите название лекции') }}</label>
+                     <div class="col-md-12">
+                        <input type="text" placeholder="Введите название лекции" class="form-control" name="name" id="name">
                      </div>
                   </div>
-                  <div class="row mb-3">
-                     <label for="name" class="col-md-4 col-form-label text-light text-md-end">{{ __('Введите краткое описание лекции') }}</label>
-                     <div class="col-md-6">
-                        <textarea name="description" class="form-control" id="description"></textarea>
-                     </div>
-                  </div>
-                  <div class="row mb-3">
-                     <label for="name" class="col-md-4 col-form-label text-light text-md-end">{{ __('Введите содержимое лекции') }}</label>
-                     <div class="col-md-6">
-                        <textarea class="form-control" name="text_lectures" id="text_lectures"></textarea>
-                     </div>
-                  </div>
-                  <div class="row mb-3">
-                     <label for="name" class="col-md-4 col-form-label text-light text-md-end">{{ __('Выберите курс') }}</label>
-                     <div class="col-md-6">
+                  <div class="mb-3">
+                     <label class="text-white" for="name" class="col-md-4 col-form-label text-md-end">{{ __('Выберите курс') }}</label>
+                     <div class="col-md-12">
                         <select name="courses" class="form-control">
                            @foreach ($allcourses as $courses)
                            <option value="{{ $courses->id }}">{{ $courses->name }}</option>
@@ -41,11 +30,42 @@
                         </select>
                      </div>
                   </div>
-                  <button class="btn btn-primary" type="submit">Добавить лекцию</button>
+                  <div class="mb-3">
+                     <label class="text-white" for="name" class="col-md-4 col-form-label text-md-end">{{ __('Введите краткое описание лекции') }}</label>
+                     <div class="col-md-12">
+                        <input type="text"  id="" name="description" placeholder="Введите краткое описание лекции" class="form-control"/>
+                     </div>
+                  </div>
+                  <div class="mb-3">
+                     <label class="text-white" for="name" class="col-md-4 col-form-label text-md-end">{{ __('Введите содержимое лекции') }}</label>
+                     <div class="col-md-12">
+                        <input class="tinymce" id="editor" class="form-control" placeholder="Введите содержимое лекции'" name="text_lectures"/>
+                     </div>
+                  </div>
+               </div>
+                  <div class="mb-3">
+                     <label class="text-white" for="name" class="col-md-4 col-form-label text-md-end">{{ __('Добавьте документ') }}</label>
+                     <div class="col-md-6">
+                        <input type="file" name="file_document" id="file_document">
+                     </div>
+                  </div>
+                  <div class="text-center">
+                     <button class="btn main large-button" type="submit">Добавить лекцию</button>
+                   </div>
+               
                </form>
             </div>
          </div>
       </div>
    </div>
 </div>
+
+<script>
+   tinymce.init({
+     selector: '#editor',
+     plugins: 'powerpaste advcode code casechange searchreplace autolink directionality advcode visualblocks visualchars image link media mediaembed codesample table charmap pagebreak nonbreaking anchor tableofcontents insertdatetime advlist lists checklist wordcount tinymcespellchecker editimage help formatpainter permanentpen charmap linkchecker emoticons advtable export autosave',
+     toolbar: 'code | undo redo formatpainter | visualblocks | alignleft aligncenter alignright alignjustify | blocks fontfamily fontsize | bold italic underline forecolor backcolor | lineheight | removeformat',
+     height: '400px',
+   });
+</script>
 @endsection

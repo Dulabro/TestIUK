@@ -2,17 +2,20 @@
 <link href="{{ asset('css/home.css') }}" rel="stylesheet">
 <style>
    table {
-   width: 100%;
-   border-collapse: collapse;
-   }
-   th, td {
-   padding: 8px;
-   text-align: left;
-   border-bottom: 1px solid #ddd;
-   }
-   th {
-   background-color: #f2f2f2;
-   }
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  border: 1px solid #caf0f8;
+  padding: 8px;
+  text-align: left;
+}
+th {
+    background-color: #184c99;
+    font-weight: bold;
+    color: #fff;
+}
    form {
    display: inline-block;
    }
@@ -52,11 +55,11 @@
                   <td class="text-light">{{ $user['email'] }}</td>
                   <td>
                      {{--  --}}
-                     <form action="" method="POST">
-                        {{-- @csrf --}}
-                        {{-- @method('DELETE') --}}
+                     <form action="{{ route('deleteUser', ['id' => $user['id']]) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
                         <button type="submit">Удалить</button>
-                     </form>
+                    </form>
                   </td>
                </tr>
                @endforeach

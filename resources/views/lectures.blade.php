@@ -7,49 +7,55 @@
       </svg>
    </div>
    <div class="card-body">
+      <div class="card-header text-light" style="font-size:23px; text-align:center; height:4rem;">{{ __('Лист предварительного просмотра') }}</div>
+      <div class="card-header text-light" style="font-size:19px; text-align:center; height:4rem;">{{$lectures->name}}</div>
       @if (session('status'))
       <div class="alert alert-success" role="alert">
          {{ session('status') }}
       </div>
       @endif
-      <div class="card-header text-light offset-md-4" style="font-size:23px; height:4rem;">{{ __('Лист предварительного просмотра') }}</div>
-      <div class="lecture">
+     
          @if (session('status'))
          <div class="alert alert-success" role="alert">
             {{ session('status') }}
          </div>
          @endif
-         <span class="text-primary">Название курса:</span>
+       
+         <div class="lecture">
+         <span class="text-light">Краткое описание лекции</span>
          <br>
-         <span class="text-light">{{$lectures->name}}</span>
-         <br>
-         <span class="text-primary">Краткое описание лекции</span>
-         <br>
-         <textarea id="w3review" name="w3review" readonly rows="4" cols="50">{{$lectures->description}}</textarea>
-         <br>
-         <span class="text-primary">Лекция</span>
-         <br>
-         <textarea id="w3review" name="w3review" readonly rows="4" cols="50">{!!$lectures->text_lectures!!}</textarea>
-         @role('admin')
-         <form method="POST" action="{{ route('lectures.destroy', $lectures->id) }}">
-            @csrf @method('DELETE')
-            <button type="submit" class="btn btn-danger">Удалить</button>
-         </form>
-         <a href="{{ route('lectures.edit', ['lecture' => $lectures->id]) }}" class="btn btn-primary">Редактировать</a>
-         <a href="{{ url()->previous() }}" class="btn btn-primary">Назад</a>
-         @endrole
+         <textarea id="w3review" class="form-control" style="overflow: hidden" name="w3review" readonly rows="4" cols="50">{!!$lectures->description!!}</textarea>
+      
       </div>
-      <div class="ag-format-container">
-         <div class="ag-courses_box">
-            <div class="blocks">
-               @foreach ($tests as $test)
-               <a href="{{ route('test.show',['id' => $test->id]) }}" class="m-2 btn btn-success">{{ $test->name }}</a>
-               @endforeach
-            </div>
-         </div>
-      </div>
+         <span class="text-light">Лекция</span>
+         <br>
+         <div id="text_lectures" style="overflow: hidden" class="form-control" name="w3review" readonly rows="4" cols="50">{!! $lectures->text_lectures !!}  </div>
+         <div class="text-center">
+            <a href="{{ route('download', ['id' => $lectures->id]) }}" class="btn main large-button">Скачать документ</a>
+            @role('admin')
+            <form method="POST" action="{{ route('lectures.destroy', $lectures->id) }}">
+               @csrf @method('DELETE')
+               <button type="submit" class="btn btn-danger large-button">Удалить</button>
+            </form>
+            <a href="{{ route('lectures.edit', ['lecture' => $lectures->id]) }}" class="btn main large-button">Редактировать</a>
+            <a href="{{ route('course') }}" class="btn main large-button">Назад</a>
+            @endrole
+          </div>
+       
+        
+     
    </div>
 </div>
 </div>
 </div>
+<script>
+window.onload = function() {
+   const textarea1 = document.getElementById('w3review');
+   const textarea2 = document.getElementById('text_lectures');
+   textarea1.style.height = 'auto';
+   textarea1.style.height = `${textarea1.scrollHeight}px`;
+   textarea2.style.height = 'auto';
+   textarea2.style.height = `${textarea2.scrollHeight}px`;
+};
+</script>
 @endsection

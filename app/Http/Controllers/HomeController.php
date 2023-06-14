@@ -36,33 +36,33 @@ class HomeController extends Controller
 
         $user = Auth::user();
         $courseIds = Courses::pluck('id')->toArray();
-        // $lessonCount = Lecture::whereIn('course_id', $courseIds)->count();
-        // $lessonCount = DB::table('lectures')
-        //     ->whereIn('course_id', $courseIds)
-        //     ->count()->get();
-        // var_dump($lessonCount);
-        // return 0;
-       
-       
-       
+        $id_author = auth()->id();
         if($user->id_status=="1")
         {
-            $id_author = auth()->id();
-            // $courses = DB::table('courses')->where('id_author', $id_author)->get();
-            $courses = Courses::select("courses.id","courses.name","courses.description","courses.duration","users.name as author_name")->leftJoin("users", "courses.id_author", "=", "users.id")->where('id_author', $id_author)->get();
+            $courses = DB::table('courses')
+            ->join('users', 'courses.id_author', '=', 'users.id')
+            ->leftJoin('lectures', 'courses.id', '=', 'lectures.id_course')
+            ->leftJoin('tests', 'courses.id', '=', 'tests.id_course')
+            ->select('courses.id','courses.name', 'courses.description', 'courses.duration', 'users.name as author_name', DB::raw('COUNT(DISTINCT lectures.id) as lecture_count'), DB::raw('COUNT(DISTINCT tests.id) as test_count'))
+            ->whereIn('courses.id', $courseIds)
+            ->where('courses.id_author', $id_author)
+            ->groupBy('courses.id', 'courses.name', 'courses.description', 'courses.duration', 'users.name')
+            ->get();
         }
         else if($user->id_status=="2")
         {
-            $id_author = auth()->id();
-            // $courses = DB::table('courses')->where('id_author', $id_author)->get();
-            // $courses = CourseAuthor::select('courses.id as courses_id', 'courses.name as courses_name', 'courses.description as courses_description')->leftJoin('courses', 'CourseAuthors.id_course', '=', 'courses.id')->where('id_author', $id_author)->get();
+            $courses = DB::table('CourseAuthors')
+    ->leftJoin('courses', 'CourseAuthors.id_course', '=', 'courses.id')
+    ->join('users', 'courses.id_author', '=', 'users.id')
+    ->leftJoin('lectures', 'courses.id', '=', 'lectures.id_course')
+    ->leftJoin('tests', 'courses.id', '=', 'tests.id_course')
+    ->select('courses.id', 'courses.name', 'courses.description', 'courses.duration', 'users.name as author_name', DB::raw('COUNT(DISTINCT lectures.id) as lecture_count'), DB::raw('COUNT(DISTINCT tests.id) as test_count'))
+    ->whereIn('courses.id', $courseIds)
+    ->where('CourseAuthors.id_author', $id_author)
+    ->groupBy('courses.id','courses.name', 'courses.description', 'courses.duration', 'users.name')
+    ->get();
 
-            $courses =   DB::table('CourseAuthors')
-            ->leftJoin('courses', 'CourseAuthors.id_course', '=', 'courses.id')
-            // ->leftJoin('users', 'courses.id_author', '=', 'users.id')
-            ->select('courses.id as courses_id', 'courses.name as courses_name', 'courses.description as courses_description')
-            ->where('CourseAuthors.id_author', '=', $id_author)
-            ->get();
+        
         }
         
         
@@ -97,7 +97,7 @@ class HomeController extends Controller
         $request->validate([
             'current_password' => ['required', function ($attribute, $value, $fail) use ($user) {
                 if (!Hash::check($value, $user->password)) {
-                    $fail('The current password is incorrect.');
+                    $fail('Текущий пароль неверен.');
                 }
             }],
             'password' => ['required', 'confirmed', Rules\Password::min(8)],
@@ -107,7 +107,7 @@ class HomeController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        return redirect()->back()->with('success', 'Your password has been updated.');
+        return redirect()->back()->with('success', 'Ваш пароль был обновлен.');
     }
     
 }

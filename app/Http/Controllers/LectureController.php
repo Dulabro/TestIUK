@@ -20,6 +20,12 @@ class LectureController extends Controller
             'allcourses' => $allcourses
         ]);
     }
+    
+    public function back($id)
+    {
+      var_dump($id);
+      return 0;
+    }
 
     public function store(Request $request)
     {
@@ -28,13 +34,27 @@ class LectureController extends Controller
             'description' => 'required',
             'text_lectures' => 'required',
             'courses' => 'required',
+            'file_document' => 'mimes:pdf,doc,docx',
            ]);
+
+        $file = $request->file('file_document');
+      
+        if (!empty($file)) {
+            $fileName = $file->getClientOriginalName();
+            $filePath = $file->storeAs('uploads', $fileName);
+        
+        } else {
+            $filePath = null;
+           
+        }
 
         $lecture = new Lecture;
         $lecture->name = $request->name;
         $lecture->description = $request->description;
         $lecture->text_lectures = $request->text_lectures;
         $lecture->id_course = $request->courses;
+        $lecture->file_document = $filePath;
+     
 
         $lecture->save();
 
@@ -43,18 +63,22 @@ class LectureController extends Controller
     public function show($id)
     {
         $lectures = Lecture::findOrFail($id);
-        $tests = DB::table('tests')->where('id_lessons', $id)->get();
-        return view('lectures')->with('lectures', $lectures)
-        ->with('tests', $tests);
+        return view('lectures')->with('lectures', $lectures);
+
     }
     public function destroy($id)
     {
         $lecture = Lecture::find($id);
+        $idCourse = DB::table('lectures')
+        ->where('id', $id)
+        ->value('id_course');
+
+      
         if ($lecture) {
             $lecture->delete();
-            return redirect()->route('home')->with('success', 'Lecture deleted successfully.');
+            return redirect('/courses/' . $idCourse)->with('success', 'Лекция успешно удалена.');
         } else {
-            return redirect()->route('home')->with('error', 'Lecture not found.');
+            return redirect('/courses/' . $idCourse)->with('error', 'Лекция не найдена.');
         }
     }
 
@@ -73,8 +97,21 @@ class LectureController extends Controller
 
         $lecture->update($validatedData);
 
-        return redirect()->route('lectures.edit', $lecture->id)->with('success', 'Lecture updated successfully.');
+        return redirect()->route('lectures.edit', $lecture->id)->with('success', 'Лекция успешно обновлена.');
     }
-    
-    
+    public function download($id)
+    {
+        $record = Lecture::find($id);
+        if ($record) {
+            $filePath = storage_path('app/' . $record->file_document);
+            if (file_exists($filePath)) {
+                $headers = [
+                    'Content-Type' => 'application/octet-stream',
+                    'Content-Disposition' => 'attachment; filename="' . basename($filePath) . '"',
+                ];
+                return response()->file($filePath, $headers);
+            }
+        }
+        abort(404);
+    }
 }

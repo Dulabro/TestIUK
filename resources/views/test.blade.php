@@ -12,22 +12,32 @@
    </div>
    @endif
    <div class="row justify-content-center">
-      <div class="col-md-12">
+      <div class="col-md-6">
+         <div class="card-header text-light" style="font-size:23px; text-align:center; height:4rem;">{{ __('Лист предпросмотра теста') }}</div>
+         <div class="card-header text-light" style="font-size:23px; text-align:center; height:4rem;">{{ $tests->name }}</div>
          <div class="card-body">
             <form method="post" action="{{ route('test.calculateValue', ['id' => $tests->id]) }}">
                @csrf @foreach ($questions as $question)
-               <h2 class="text-light">{{ $question->question }}</h2>
+               <input type="text" class="form-control"  id="name" value="{{ old('question', $question->question) }}" readonly>
+               {{-- <h2 class="text-light">{{ $question->question }}</h2> --}}
                <div>
                   @foreach ($question->answers as $answer)
-                  <div>
-                     <input type="checkbox" name="answers[]" value="{{ $answer->valid }}" id="">
-                     <label class="text-light" for="answer_{{ $answer->id }}">{{ $answer->answer }}</label>
+                  <div class="block-test mt-4 mb-4">
+                     <input type="text" class="form-control" value="{{ old('question', $answer->answer) }}" readonly>
+                     <input type="checkbox" class="checkbox ml-2" name="answers[]" value="{{ $answer->valid }}" id="">
+
+                     {{-- <label class="text-light" for="answer_{{ $answer->id }}">{{ $answer->answer }}</label> --}}
                   </div>
                   @endforeach
                </div>
                @endforeach
-               <button class="btn btn-primary" type="submit">Отправить</button>
+               <div class="text-center">
+               <button class="btn main large-button" type="submit">Отправить</button>
+               </div>
             </form>
+            <div class="text-center">
+               <a href="{{ route('tests.edit', ['test' => $tests->id]) }}" class="btn main large-button">Редактировать</a>
+               </div>
          </div>
       </div>
    </div>

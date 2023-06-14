@@ -20,6 +20,7 @@
          </div>
          @endif
          @role("admin")
+         <div class="card-header text-light" style="font-size:23px; text-align:center; height:4rem;">{{ __('Лист курса преподователя') }}</div>
          <div class="ag-format-container">
             <div class="ag-courses_box">
                @foreach ($courses as $course)
@@ -27,24 +28,24 @@
                   <div class="block">
                      <h2>{{ $course->name }}</h2>
                      <p class="course_text">
-                        {{ $course->description }}
+                        {{ \Illuminate\Support\Str::limit($course->description, 200) }}
                      </p>
                      <div class="course_users">
                         <p>Автор курса:</p>
-                        <p>{{ $course->author_name }}</p>
+                        {{ $course->author_name }}
                      </div>
                      <div class="course_info">
                         <div class="course_time">
                            <img src="img\vector-3.svg" alt="time" class="img_block" />
-                           <p>{{ $course->duration }}ч</p>
+                           <p>{{ $course->duration }} ч.</p>
                         </div>
                         <div class="course_lesson">
                            <img src="img\vector-2.svg" alt="lesson" class="img_block" />
-                           <p>24 Лекций</p>
+                           <p>{{ $course->lecture_count }} Лекций</p>
                         </div>
                         <div class="course_test">
                            <img src="img\vector-1.svg" alt="test" class="img_block" />
-                           <p>10 Тестов</p>
+                           <p>{{ $course->test_count }} Тесты</p>
                         </div>
                         <div><a href="courses/{{$course->id}}" class="course_btn">Подробней</a></div>
                      </div>
@@ -54,12 +55,15 @@
             </div>
          </div>
          @else
+         <div class="card-header text-light" style="font-size:23px; text-align:center; height:4rem;">{{ __('Лист курса ученика') }}</div>
          <form action="/codecourse" method="post">
             @csrf
             <div class="col-md-6">
                <input id="code_course" name="code_course" type="text" placeholder="{{ __('Введите код курса') }}" class="form-control @error('code_course') is-invalid @enderror" required autofocus>
             </div>
-            <button class="btn btn-primary" type="submit">Отправить</button>
+         
+            <button class="btn main large-button" type="submit">Отправить</button>
+        
          </form>
          <div class="col-md-12">
             <div class="ag-format-container">
@@ -67,27 +71,28 @@
                   @foreach ($courses as $course)
                   <div class="course_card">
                      <div class="block">
-                        <h2>{{ $course->courses_name }}</h2>
+                        <h2>{{ $course->name }}</h2>
                         <p class="course_text">
-                           {{ $course->courses_description }}
+                           {{ \Illuminate\Support\Str::limit($course->description, 200) }}
                         </p>
                         <div class="course_users">
                            <p>Автор курса:</p>
+                           {{ $course->author_name }}
                         </div>
                         <div class="course_info">
                            <div class="course_time">
                               <img src="img\vector-3.svg" alt="time" class="img_block" />
-                              <p>12hr 20min</p>
+                              <p>{{ $course->duration }} ч.</p>
                            </div>
                            <div class="course_lesson">
                               <img src="img\vector-2.svg" alt="lesson" class="img_block" />
-                              <p>24 Лекций</p>
+                              <p>{{ $course->lecture_count }} Лекций</p>
                            </div>
                            <div class="course_test">
                               <img src="img\vector-1.svg" alt="test" class="img_block" />
-                              <p>10 Тестов</p>
+                              <p>{{ $course->test_count }} Тесты</p>
                            </div>
-                           <div><a href="courses/{{$course->courses_id}}" class="course_btn">Подробней</a></div>
+                           <div><a href="courses/{{$course->id}}" class="course_btn">Подробней</a></div>
                         </div>
                      </div>
                   </div>
